@@ -1,0 +1,19 @@
+<openerp>
+    <data>
+       <record model="theater.movie" id="movie0">
+            <field name="name">Movie 0</field>
+            <field name="description">Movie 0's description
+
+Can have multiple lines
+            </field>
+        </record>
+        <record model="theater.movie" id="movie1">
+            <field name="name">Movie 1</field>
+            <!-- no description for this one -->
+        </record>
+        <record model="theater.movie" id="movie2">
+            <field name="name">Movie 2</field>
+            <field name="description">Movie 2's description</field>
+        </record>
+    </data>
+</openerp>

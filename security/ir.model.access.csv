@@ -1,0 +1,5 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+movie_manager,movie manager,model_theater_movie,group_manager,1,1,1,1
+time_manager,time manager,model_theater_time,group_manager,1,1,1,1
+movie_read_all,movie all,model_theater_movie,,1,0,0,0
+time_read_all,time all,model_theater_time,,1,0,0,0

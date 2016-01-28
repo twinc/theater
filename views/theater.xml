@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    	<record model="ir.ui.view" id="movie_form_view">
+            <field name="name">movie.form</field>
+            <field name="model">theater.movie</field>
+            <field name="arch" type="xml">
+                <form string="Movie Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="type_id"/>
+                        </group>
+                         <notebook>
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                            <page string="Times">
+                                <field name="time_ids">
+                                    <tree string="Registered sessions">
+                                        <field name="theatername"/>
+                                        <field name="company_id"/>
+                                        <field name="start_date"/>
+                                        <field name="taken_seats" widget="progressbar"/>                       
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+          <record model="ir.ui.view" id="movie_search_view">
+            <field name="name">movie.search</field>
+            <field name="model">theater.movie</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <filter name="my_movies" string="Movie"
+                            domain="[('type_id', '=', uid)]"/>
+                    <group string="Group By">
+                        <filter name="by_type" string="Type"
+                                context="{'group_by': 'type_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <!-- override the automatically generated list view for courses -->
+        <record model="ir.ui.view" id="movie_tree_view">
+            <field name="name">movie.tree</field>
+            <field name="model">theater.movie</field>
+            <field name="arch" type="xml">
+                <tree string="Movie Tree">
+                    <field name="name"/>
+                    <field name="type_id"/>
+                </tree>
+            </field>
+        </record>
+        <!-- window action -->
+        <!--
+            The following tag is an action definition for a "window action",
+            that is an action opening a view or a set of views
+        -->
+        <record model="ir.actions.act_window" id="movie_list_action">
+            <field name="name">Movie</field>
+            <field name="res_model">theater.movie</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context" eval="{'search_default_my_movies': 1}"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first movie
+                </p>
+            </field>
+        </record>
+
+        <!-- top level menu: no parent -->
+        <menuitem id="main_theater_menu" name="Theater"/>
+    
+        <menuitem id="theater_menu" name="Theater"
+                  parent="main_theater_menu"/>
+  
+        <menuitem id="movies_menu" name="Movies" parent="theater_menu"
+                  action="movie_list_action"/>
+        <!-- Full id location:
+             action="theater.movie_list_action"
+             It is not required when it is the same module -->
+             
+          <!-- time form view -->
+        <record model="ir.ui.view" id="time_form_view">
+            <field name="name">time.form</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <form string="Time Form">
+                	<header>
+                        <button name="action_draft" type="object"
+                                string="Reset to draft"
+                                states="confirmed,done"/>
+                        <button name="action_confirm" type="object"
+                                string="Confirm" states="draft"
+                                class="oe_highlight"/>
+                        <button name="action_done" type="object"
+                                string="Mark as done" states="confirmed"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                	
+                    <sheet>
+                        <group>
+                           <group string="General">
+                                <field name="movie_id"/>
+                                <field name="theatername"/>
+                                <field name="company_id"/>
+                                <field name="active"/>
+                            </group>
+                            <group string="Schedule">
+                                <field name="start_date"/>
+                                <field name="duration"/>
+                                <field name="seats"/>
+                                 <field name="taken_seats" widget="progressbar"/>
+                            </group>
+                        </group>
+                        <label for="attendee_ids"/>
+                      	<field name="attendee_ids"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+		
+		 <!-- session tree/list view -->
+        <record model="ir.ui.view" id="theater_tree_view">
+            <field name="name">time.tree</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <tree string="Time Tree" colors="#0000ff:duration&lt;5;red:duration&gt;15">
+                    <field name="theatername"/>
+                    <field name="movie_id"/>
+                    <field name="duration" invisible="1"/>
+                    <field name="taken_seats" widget="progressbar"/>
+                </tree>
+            </field>
+        </record>
+		
+		<!-- calendar view -->
+        <record model="ir.ui.view" id="time_calendar_view">
+            <field name="name">time.calendar</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <calendar string="Time Calendar" date_start="start_date"
+                          date_stop="end_date"
+                          color="company_id">
+                    <field name="theatername"/>
+                </calendar>
+            </field>
+        </record>
+		
+		<!-- Gantt -->>
+		<record model="ir.ui.view" id="time_gantt_view">
+            <field name="name">time.gantt</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <gantt string="Time Gantt" color="movie_id"
+                       date_start="start_date" date_delay="hours"
+                       default_group_by='movie_id'>
+                    <field name="theatername"/>
+                </gantt>
+            </field>
+        </record>
+		
+		<!-- Graph -->>
+		<record model="ir.ui.view" id="theater_time_graph_view">
+            <field name="name">theater.time.graph</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <graph string="Participations by Movies">
+                    <field name="movie_id"/>
+                    <field name="attendees_count" type="measure"/>
+                </graph>
+            </field>
+        </record>
+		
+		<!-- Kanban -->>
+		<record model="ir.ui.view" id="view_openacad_session_kanban">
+            <field name="name">theater.time.kanban</field>
+            <field name="model">theater.time</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="movie_id">
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div
+                                    t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
+                                                  oe_kanban_global_click_edit oe_semantic_html_override
+                                                  oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
+                                <div class="oe_dropdown_kanban">
+                                    <!-- dropdown menu -->
+                                    <div class="oe_dropdown_toggle">
+                                        <i class="fa fa-bars fa-lg"/>
+                                        <ul class="oe_dropdown_menu">
+                                            <li>
+                                                <a type="delete">Delete</a>
+                                            </li>
+                                            <li>
+                                                <ul class="oe_kanban_colorpicker"
+                                                    data-field="color"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="oe_clear"></div>
+                                </div>
+                                <div t-attf-class="oe_kanban_content">
+                                    <!-- title -->
+                                    Session name:
+                                    <field name="theatername"/>
+                                    <br/>
+                                    Start date:
+                                    <field name="start_date"/>
+                                    <br/>
+                                    duration:
+                                    <field name="duration"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+		
+        <record model="ir.actions.act_window" id="time_list_action">
+            <field name="name">Times</field>
+            <field name="res_model">theater.time</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,gantt,graph,kanban</field>
+        </record>
+
+        <menuitem id="time_menu" name="Times"
+                  parent="theater_menu"
+                  action="time_list_action"/>   
+        
+        <record model="ir.ui.view" id="wizard_form_view">
+            <field name="name">wizard.form</field>
+            <field name="model">theater.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <group>
+                        <field name="time_id"/>
+                        <field name="attendee_ids"/>
+                    </group>
+                    	 <footer>
+                        <button name="subscribe" type="object"
+                                string="Subscribe" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="launch_time_wizard"
+                    name="Add Attendees"
+                    src_model="theater.time"
+                    res_model="theater.wizard"
+                    view_mode="form"
+                    target="new"
+                    key2="client_action_multi"/>
+    </data>
+</openerp>
